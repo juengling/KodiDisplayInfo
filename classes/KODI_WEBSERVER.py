@@ -10,12 +10,15 @@ class KODI_WEBSERVER:
         self.helper = helper
         self._ConfigDefault = _ConfigDefault
         self.draw_default = draw_default
-        
-        self.ip_port = 'http://'
+
+        self.ip_port = 'http://'+self.ip_port+self._ConfigDefault['KODI.webserver.host']+':'+self._ConfigDefault['KODI.webserver.port']+'/jsonrpc'
+
         if self._ConfigDefault['KODI.webserver.user']!="" and self._ConfigDefault['KODI.webserver.pass']!="":
-            self.ip_port = self.ip_port+self._ConfigDefault['KODI.webserver.user']+':'+self._ConfigDefault['KODI.webserver.pass']+'@'
-        self.ip_port = self.ip_port+self._ConfigDefault['KODI.webserver.host']+':'+self._ConfigDefault['KODI.webserver.port']+'/jsonrpc'
-        
+           self.passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+           self.passman.add_password(None, self.ip_port, self._ConfigDefault['KODI.webserver.user'], self._ConfigDefault['KODI.webserver.pass'])
+           urllib2.install_opener(urllib2.build_opener(urllib2.HTTPBasicAuthHandler(self.passman)))
+
+
     def getJSON(self, jsondata, get_parameter = '?request='):
         self.draw_default.setInfoText("", self._ConfigDefault['color.white'])
         try:
