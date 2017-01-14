@@ -1,6 +1,7 @@
-import urllib2
+import urllib2, warnings
 import json
 from socket import timeout
+warnings.filterwarnings("ignore", category=UserWarning, module='urllib2')
 
 class KODI_WEBSERVER:
     
