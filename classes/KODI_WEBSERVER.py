@@ -1,4 +1,4 @@
-import urllib2, warnings
+import urllib.request, urllib.error, urllib.parse, warnings
 import json
 from socket import timeout
 warnings.filterwarnings("ignore", category=UserWarning, module='urllib2')
@@ -15,9 +15,9 @@ class KODI_WEBSERVER:
         self.ip_port = 'http://'+self.ip_port+self._ConfigDefault['KODI.webserver.host']+':'+self._ConfigDefault['KODI.webserver.port']+'/jsonrpc'
 
         if self._ConfigDefault['KODI.webserver.user']!="" and self._ConfigDefault['KODI.webserver.pass']!="":
-           self.passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+           self.passman = urllib.request.HTTPPasswordMgrWithDefaultRealm()
            self.passman.add_password(None, self.ip_port, self._ConfigDefault['KODI.webserver.user'], self._ConfigDefault['KODI.webserver.pass'])
-           urllib2.install_opener(urllib2.build_opener(urllib2.HTTPBasicAuthHandler(self.passman)))
+           urllib.request.install_opener(urllib.request.build_opener(urllib.request.HTTPBasicAuthHandler(self.passman)))
 
 
     def getJSON(self, jsondata, get_parameter = '?request='):
@@ -26,9 +26,9 @@ class KODI_WEBSERVER:
             headers = {'content-type': 'application/json'}
             json_data = json.dumps(json.loads(jsondata))
             post_data = json_data.encode('utf-8')
-            request = urllib2.Request(self.ip_port + get_parameter, post_data, headers)
+            request = urllib.request.Request(self.ip_port + get_parameter, post_data, headers)
             
-            result = urllib2.urlopen(request,timeout=3).read()
+            result = urllib.request.urlopen(request,timeout=3).read()
             return json.loads(result.decode("utf-8"))
         except IOError:
             self.draw_default.setInfoText("NO KODI ACCESS!", self._ConfigDefault['color.red'])
@@ -48,7 +48,7 @@ class KODI_WEBSERVER:
                 return 0, ""
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
-            print 'Decoding JSON has failed'
+            print('Decoding JSON has failed')
             return ""
         
     def KODI_GetItem(self, playerid, playertype):
@@ -72,7 +72,7 @@ class KODI_WEBSERVER:
                 return ""
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
-            print 'Decoding JSON has failed'
+            print('Decoding JSON has failed')
             return ""  
         
     def KODI_GetProperties(self, playerid):
@@ -83,14 +83,14 @@ class KODI_WEBSERVER:
                 media_time = [int(parsed_json['result']['time']['hours']),int(parsed_json['result']['time']['minutes']),int(parsed_json['result']['time']['seconds'])]
                 media_timetotal = [int(parsed_json['result']['totaltime']['hours']),int(parsed_json['result']['totaltime']['minutes']),int(parsed_json['result']['totaltime']['seconds'])]
                 return speed, media_time, media_timetotal
-            except KeyError, e:
-                print "KeyError: " + str(e)
+            except KeyError as e:
+                print("KeyError: " + str(e))
                 return 0,[0,0,0],[0,0,0]
-            except IndexError, e:
-                print "IndexError: " + str(e)
+            except IndexError as e:
+                print("IndexError: " + str(e))
                 return 0,[0,0,0],[0,0,0]
-        
+
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
-            print 'Decoding JSON has failed'
-            return 0,[0,0,0],[0,0,0]
+            print('Decoding JSON has failed')
+        

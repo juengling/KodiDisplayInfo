@@ -21,7 +21,7 @@ import os
 import sys
 import datetime
 import pygame
-import ConfigParser
+import configparser
 from pygame.locals import *
 from classes.Helper import Helper
 from classes.DrawToDisplay_Default import DrawToDisplay_Default
@@ -70,8 +70,8 @@ helper = Helper(_ConfigDefault)
 
 # init config
 helper.printout("[info]    ", _ConfigDefault['mesg.green'])
-print "Parse Config"
-configParser = ConfigParser.RawConfigParser()   
+print("Parse Config")
+configParser = configparser.RawConfigParser()   
 configFilePath = r''+basedirpath+'config.txt'
 configParser.read(configFilePath)
 
@@ -82,7 +82,7 @@ if configParser.has_option('CONFIG', 'SCREENMODUS'):
         _ConfigDefault['config.screenmodus'] = temp
     else:
         helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
-        print "Config [CONFIG] SCREENMODUS not set correctly - default is activ!"
+        print("Config [CONFIG] SCREENMODUS not set correctly - default is activ!")
         
 if configParser.has_option('CONFIG', 'TITLEFORMAT'):
     temp = configParser.get('CONFIG', 'TITLEFORMAT')
@@ -90,7 +90,7 @@ if configParser.has_option('CONFIG', 'TITLEFORMAT'):
         _ConfigDefault['config.titleformat'] = temp
     else:
         helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
-        print "Config [CONFIG] TITLEFORMAT not set correctly - default is activ!"
+        print("Config [CONFIG] TITLEFORMAT not set correctly - default is activ!")
         
 if configParser.has_option('CONFIG', 'TIMEFORMAT'):
     temp = configParser.get('CONFIG', 'TIMEFORMAT')
@@ -98,7 +98,7 @@ if configParser.has_option('CONFIG', 'TIMEFORMAT'):
         _ConfigDefault['config.timeformat'] = temp
     else:
         helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
-        print "Config [CONFIG] TIMEFORMAT not set correctly - default is activ!" 
+        print("Config [CONFIG] TIMEFORMAT not set correctly - default is activ!") 
         
 if configParser.has_option('DISPLAY', 'RESOLUTION'):
     temp = configParser.get('DISPLAY', 'RESOLUTION')
@@ -106,7 +106,7 @@ if configParser.has_option('DISPLAY', 'RESOLUTION'):
         _ConfigDefault['display.resolution'] = temp
     else:
         helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
-        print "Config [DISPLAY] RESOLUTION not set correctly - default is activ!"
+        print("Config [DISPLAY] RESOLUTION not set correctly - default is activ!")
 
 if configParser.has_option('KODI_WEBSERVER', 'HOST'):
     _ConfigDefault['KODI.webserver.host'] = configParser.get('KODI_WEBSERVER', 'HOST')
@@ -141,7 +141,7 @@ def main():
     media_title = ""
 
     helper.printout("[info]    ", _ConfigDefault['mesg.cyan'])
-    print "Start: KodiDisplayInfo"
+    print("Start: KodiDisplayInfo")
     
     pygame.init()
     screen = pygame.display.set_mode(getattr(draw_default, 'Screen'+_ConfigDefault['display.resolution'])(), 0, 32)
@@ -159,7 +159,7 @@ def main():
     
     draw_default.setPygameScreen(pygame, screen)
     draw_videotime.setPygameScreen(pygame, screen, draw_default)
-    
+
     running = True
     # run the game loop
     try:        
@@ -193,11 +193,14 @@ def main():
                 # API has nothing
                 media_title = ""
                 draw_default.drawLogoStartScreen(time_now)
-    
+            
+            #Show the image URL
+            #Cover = KODI_WEBSERVER.KODI_GetCoverURL(playerid)
+            
             pygame.display.flip()
         
         helper.printout("[end]     ", _ConfigDefault['mesg.magenta'])
-        print "bye ..."
+        print("bye ...")
         main_exit()
     except SystemExit:
         main_exit()
