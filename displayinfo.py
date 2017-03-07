@@ -3,6 +3,8 @@
 # Autor: Bjoern Reichert <opendisplaycase[at]gmx.net>
 # License: GNU General Public License (GNU GPLv3)
 #
+# Modified by Daniel Siegmanski <daniel.siegmanski[at]gmail.com>
+#
 # v1.0    XBMC 12 Frodo Release [April 2014]
 # v1.1    ADD config.txt for Webserver
 # v2.0    XBMC 13 Gotham
@@ -16,6 +18,10 @@
 #         -> ideas from Andrea Prunic <aprunic[at]gmail.com>
 # v3.4    Use the video structure for audio, update class KODI_WEBSERVER
 # v3.5    Delete v3.1
+#
+# From here modified by Daniel Siegmanski
+#
+# v4.0    Converted to python3
 
 import os
 import sys
