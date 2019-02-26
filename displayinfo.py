@@ -21,7 +21,8 @@
 #
 # From here modified by Daniel Siegmanski
 #
-# v4.0    Converted to python3
+# v4.0      Converted to python3
+# v4.1      Neue Anzeigemethode für Musik hinzugefügt "musicthumb"
 
 import os
 import sys
@@ -33,6 +34,7 @@ from classes.Helper import Helper
 from classes.DrawToDisplay_Default import DrawToDisplay_Default
 from classes.DrawToDisplay_VideoTime import DrawToDisplay_VideoTime
 from classes.KODI_WEBSERVER import KODI_WEBSERVER
+from classes.DrawToDisplay_MusicThumbnail import DrawToDisplay_MusicThumbnail
 
 basedirpath = os.path.dirname(os.path.realpath(__file__)) + os.sep
 
@@ -61,7 +63,8 @@ _ConfigDefault = {
     
     "display.resolution":       "320x240",   
     
-    "config.screenmodus":       "time",
+    "config.screenmodus_music":       "thumbnail",
+    "config.screenmodus_video":       "time",
     "config.titleformat":       "oneline",
     "config.timeformat":        "minutes", 
                   
@@ -77,18 +80,26 @@ helper = Helper(_ConfigDefault)
 # init config
 helper.printout("[info]    ", _ConfigDefault['mesg.green'])
 print("Parse Config")
-configParser = configparser.RawConfigParser()   
+configParser = configparser.RawConfigParser()
 configFilePath = r''+basedirpath+'config.txt'
 configParser.read(configFilePath)
 
 # check config
-if configParser.has_option('CONFIG', 'SCREENMODUS'):
-    temp = configParser.get('CONFIG', 'SCREENMODUS')
-    if temp=="time" or temp=="thumbnail":
-        _ConfigDefault['config.screenmodus'] = temp
+if configParser.has_option('CONFIG', 'SCREENMODUS_MUSIC'):
+    temp = configParser.get('CONFIG', 'SCREENMODUS_MUSIC')
+    if temp=="thumbnail":
+        _ConfigDefault['config.screenmodus_music'] = temp
     else:
         helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
-        print("Config [CONFIG] SCREENMODUS not set correctly - default is activ!")
+        print("Config [CONFIG] SCREENMODUS_MUSIC not set correctly - default is activ!")
+
+if configParser.has_option('CONFIG', 'SCREENMODUS_VIDEO'):
+    temp = configParser.get('CONFIG', 'SCREENMODUS_VIDEO')
+    if temp=="time":
+        _ConfigDefault['config.screenmodus_video'] = temp
+    else:
+        helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
+        print("Config [CONFIG] SCREENMODUS_VIDEO not set correctly - default is activ!")
         
 if configParser.has_option('CONFIG', 'TITLEFORMAT'):
     temp = configParser.get('CONFIG', 'TITLEFORMAT')
@@ -138,6 +149,7 @@ if configParser.has_option('COLOR', 'ORANGE'):
 if configParser.get('DISPLAY', 'FBDEV')!="":
     os.environ["SDL_FBDEV"] = configParser.get('DISPLAY', 'FBDEV')
 
+
 def main_exit():
     pygame.quit()
     sys.exit()
@@ -145,6 +157,7 @@ def main_exit():
 def main():
     time_now = 0
     media_title = ""
+    old_album = ""
 
     helper.printout("[info]    ", _ConfigDefault['mesg.cyan'])
     print("Start: KodiDisplayInfo")
@@ -162,9 +175,12 @@ def main():
     
     # set timer for the event
     pygame.time.set_timer(reloaded_event, RELOAD_SPEED)
-    
+
     draw_default.setPygameScreen(pygame, screen)
-    draw_videotime.setPygameScreen(pygame, screen, draw_default)
+    if _ConfigDefault['config.screenmodus_video'] == "time":
+        draw_videotime.setPygameScreen(pygame, screen, draw_default)
+    if _ConfigDefault['config.screenmodus_music'] == "thumbnail":
+        draw_musicthumbnail.setPygameScreen(pygame, screen, draw_default)
 
     running = True
     # run the game loop
@@ -174,35 +190,48 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                #elif event.type == pygame.MOUSEBUTTONDOWN:
-                #    print "mouse at (%d, %d)" % event.pos
-                #elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                #    running = False
-                
+
             time_now = datetime.datetime.now()
-            #start draw
+            # start draw
             screen.fill(_ConfigDefault['color.black']) #reset
             
             playerid, playertype = KODI_WEBSERVER.KODI_GetActivePlayers()
             if playertype=="video" and int(playerid) >= 0:    
                 media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
                 speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
-                if _ConfigDefault['config.screenmodus']=="time":
+                if _ConfigDefault['config.screenmodus_video']=="time":
                     draw_videotime.drawProperties(media_title, time_now, speed, media_time, media_totaltime)
             elif playertype == "audio" and int(playerid) >= 0:
-                # Clone from Video
-                media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
+                # Artist, Album und Titel herausfinden
+                media_artist, media_album, media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
                 speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
-                if _ConfigDefault['config.screenmodus']=="time":
+                if _ConfigDefault['config.screenmodus_music'] == "time":
                     draw_videotime.drawProperties(media_title, time_now, speed, media_time, media_totaltime)
+                # Anzeigemodus "Thumnail" ist gewählt
+                if _ConfigDefault['config.screenmodus_music'] == "thumbnail":
+                    # Neues Cover nur anfordern wenn sich das Album geändert hat
+                    if not media_album == old_album:
+                        # Die URL für das Cover herausfinden
+                        url = KODI_WEBSERVER.KODI_GetCoverURL(playerid)
+                        # Das Cover nur herunterladen wenn es es auch gibt
+                        if not url == "":
+                            thumbnail = KODI_WEBSERVER.KODI_DownloadCover(url)
+                            helper.printout("[info]    ", _ConfigDefault['mesg.green'])
+                            print("Cover gefunden für: " + str(media_album))
+                        else:
+                            helper.printout("[info]    ", _ConfigDefault['mesg.yellow'])
+                            print("Kein Cover gefunden für: " + str(media_album))
+                            thumbnail = "#empty"
+                        old_album = media_album
+
+                    # Das Cover auf's Display bringen
+                    draw_musicthumbnail.DrawMusicInfo(thumbnail, media_artist, media_album, media_title)
             else:
                 # API has nothing
                 media_title = ""
                 draw_default.drawLogoStartScreen(time_now)
             
-            #Show the image URL
-            #Cover = KODI_WEBSERVER.KODI_GetCoverURL(playerid)
-            
+
             pygame.display.flip()
         
         helper.printout("[end]     ", _ConfigDefault['mesg.magenta'])
@@ -216,8 +245,10 @@ def main():
 if __name__ == "__main__":
     draw_default = DrawToDisplay_Default(helper, _ConfigDefault)
     
-    if _ConfigDefault['config.screenmodus']=="time":
+    if _ConfigDefault['config.screenmodus_video']=="time":
         draw_videotime = DrawToDisplay_VideoTime(helper, _ConfigDefault)
+    if _ConfigDefault['config.screenmodus_music'] == "thumbnail":
+        draw_musicthumbnail = DrawToDisplay_MusicThumbnail(helper, _ConfigDefault)
     
     KODI_WEBSERVER = KODI_WEBSERVER(helper, _ConfigDefault, draw_default)
     main()
