@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# KodiDisplayInfo v3.0
+# KodiDisplayInfo v4.1
 # Autor: Bjoern Reichert <opendisplaycase[at]gmx.net>
 # License: GNU General Public License (GNU GPLv3)
 #
-# Modified by Daniel Siegmanski <daniel.siegmanski[at]gmail.com>
+# Modified by Daniel Siegmanski <webmaster[at]dsiggi.de>
 #
 # v1.0    XBMC 12 Frodo Release [April 2014]
 # v1.1    ADD config.txt for Webserver
@@ -177,8 +177,8 @@ def main():
     pygame.time.set_timer(reloaded_event, RELOAD_SPEED)
 
     draw_default.setPygameScreen(pygame, screen)
-    if _ConfigDefault['config.screenmodus_video'] == "time":
-        draw_videotime.setPygameScreen(pygame, screen, draw_default)
+    #if _ConfigDefault['config.screenmodus_video'] == "time":
+    #    draw_videotime.setPygameScreen(pygame, screen, draw_default)
     if _ConfigDefault['config.screenmodus_music'] == "thumbnail":
         draw_musicthumbnail.setPygameScreen(pygame, screen, draw_default)
 
@@ -196,12 +196,12 @@ def main():
             screen.fill(_ConfigDefault['color.black']) #reset
             
             playerid, playertype = KODI_WEBSERVER.KODI_GetActivePlayers()
-            if playertype=="video" and int(playerid) >= 0:    
-                media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
-                speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
-                if _ConfigDefault['config.screenmodus_video']=="time":
-                    draw_videotime.drawProperties(media_title, time_now, speed, media_time, media_totaltime)
-            elif playertype == "audio" and int(playerid) >= 0:
+            #if playertype=="video" and int(playerid) >= 0:
+                #media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
+                #speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
+                #if _ConfigDefault['config.screenmodus_video']=="time":
+                    #draw_videotime.drawProperties(media_title, time_now, speed, media_time, media_totaltime)
+            if playertype == "audio" and int(playerid) >= 0:
                 # Artist, Album und Titel herausfinden
                 media_artist, media_album, media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
                 speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
@@ -245,8 +245,8 @@ def main():
 if __name__ == "__main__":
     draw_default = DrawToDisplay_Default(helper, _ConfigDefault)
     
-    if _ConfigDefault['config.screenmodus_video']=="time":
-        draw_videotime = DrawToDisplay_VideoTime(helper, _ConfigDefault)
+    #if _ConfigDefault['config.screenmodus_video']=="time":
+    #    draw_videotime = DrawToDisplay_VideoTime(helper, _ConfigDefault)
     if _ConfigDefault['config.screenmodus_music'] == "thumbnail":
         draw_musicthumbnail = DrawToDisplay_MusicThumbnail(helper, _ConfigDefault)
     
