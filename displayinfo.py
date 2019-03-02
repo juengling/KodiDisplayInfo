@@ -29,6 +29,7 @@ import sys
 import datetime
 import pygame
 import configparser
+import time
 from pygame.locals import *
 from classes.Helper import Helper
 from classes.DrawToDisplay_Default import DrawToDisplay_Default
@@ -203,6 +204,7 @@ def main():
                 #if _ConfigDefault['config.screenmodus_video']=="time":
                     #draw_videotime.drawProperties(media_title, time_now, speed, media_time, media_totaltime)
             if playertype == "audio" and int(playerid) >= 0:
+                time.sleep(0.2)  # Workaround um nach einschalten der Musik nicht in einen KeyValue-Error zu laufen
                 # Artist, Album und Titel herausfinden
                 media_artist, media_album, media_title = KODI_WEBSERVER.KODI_GetItem(playerid, playertype)
                 speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
@@ -215,7 +217,7 @@ def main():
                         # Die URL für das Cover herausfinden
                         url = KODI_WEBSERVER.KODI_GetCoverURL(playerid)
                         # Das Cover nur herunterladen wenn es es auch gibt
-                        if not url == "":
+                        if not url == "" and not 'http' in url:
                             thumbnail = KODI_WEBSERVER.KODI_DownloadCover(url)
                             helper.printout("[info]    ", _ConfigDefault['mesg.green'])
                             print("Cover gefunden für: " + str(media_album))
