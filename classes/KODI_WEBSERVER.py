@@ -3,8 +3,6 @@ import json
 from socket import timeout
 
 warnings.filterwarnings("ignore", category=UserWarning, module='urllib')
-import string
-
 
 class KODI_WEBSERVER:
     ip_port = ""
@@ -97,15 +95,17 @@ class KODI_WEBSERVER:
                 return artist, album, title
 
             except KeyError as e:
-                print("KeyError: " + str(e))
-                return "" "" ""
+                self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
+                print("KeyError: " + str(e) + " in KODI_GetItem")
+                return "", "", ""
             except IndexError as e:
-                print("IndexError: " + str(e))
-                return "" "" ""
+                self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
+                print("IndexError: " + str(e) + " in KODI_GetItem")
+                return "", "", ""
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
             print('Decoding JSON has failed')
-            return "" "" ""
+            return "", "", ""
 
     def KODI_GetProperties(self, playerid):
         try:
@@ -163,7 +163,7 @@ class KODI_WEBSERVER:
                 except urllib.error.HTTPError as err:
                     cover = ""
                     self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
-                    print(err.code)
+                    print("HTTPError: " + str(err.code))
 
                 return cover
 
