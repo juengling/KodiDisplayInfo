@@ -76,13 +76,17 @@ class KODI_WEBSERVER:
 
                 # Wandle artist von "Liste" zu "String"
                 artist = str(artist)
-                # Wenn der Künstlername ein ' enthält wird der Name wie folgt dargestellt ["Name' Name"]
-                # Enthält der Name kein ' wird er wie folgt dargestllt ['Name']
-                # Das heißt, der Name muss noch zurecht geschnitten werden
-                artist = artist.replace("[\"", "")
-                artist = artist.replace("\"]", "")
-                artist = artist.replace("['", "")
-                artist = artist.replace("']", "")
+                # Wenn kein Künslter angegeben, dann den String komplett leeren
+                if artist == "[]":
+                    artist = ""
+                else:
+                    # Wenn der Künstlername ein ' enthält wird der Name wie folgt dargestellt ["Name' Name"]
+                    # Enthält der Name kein ' wird er wie folgt dargestllt ['Name']
+                    # Das heißt, der Name muss noch zurecht geschnitten werden
+                    artist = artist.replace("[\"", "")
+                    artist = artist.replace("\"]", "")
+                    artist = artist.replace("['", "")
+                    artist = artist.replace("']", "")
 
                 if album == "":
                     album = parsed_json['result']['item']['label']

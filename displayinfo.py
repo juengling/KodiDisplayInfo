@@ -158,6 +158,7 @@ def main():
     time_now = 0
     media_title = ""
     old_album = ""
+    thumbnail = ""
 
     helper.printout("[info]    ", _ConfigDefault['mesg.cyan'])
     print("Start: KodiDisplayInfo")
