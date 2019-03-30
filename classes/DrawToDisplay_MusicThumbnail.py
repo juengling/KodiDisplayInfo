@@ -73,7 +73,14 @@ class DrawToDisplay_MusicThumbnail:
             self.old_thumbnail = thumbnail
             # Wenn ein Thumbnail gefunden wurde, wird es verwendet
             if not thumbnail == "#empty":
-                self.thumbnail = Image.open(BytesIO(thumbnail))
+                try:
+                    self.thumbnail = Image.open(BytesIO(thumbnail))
+                except ValueError:
+                    self.helper.printout("[warning]    ", self._ConfigDefault['mesg.yellow'])
+                    print('ValueError - DrawThumbnail')
+                    # Sollte bei der Veraebeitung des gefundenen Covers was schief gehen, nutzen wie das
+                    # DefaultAlbumCover
+                    self.thumbnail = Image.open(self._ConfigDefault['basedirpath'] + 'img/DefaultAlbumCover.png')
             else:
                 self.thumbnail = Image.open(self._ConfigDefault['basedirpath']+'img/DefaultAlbumCover.png')
 

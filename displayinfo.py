@@ -1,38 +1,21 @@
 #!/usr/bin/python
-# KodiDisplayInfo v4.1
+# KodiDisplayInfo v20190330
 # Autor: Bjoern Reichert <opendisplaycase[at]gmx.net>
 # License: GNU General Public License (GNU GPLv3)
 #
 # Modified by Daniel Siegmanski <webmaster[at]dsiggi.de>
 #
-# v1.0    XBMC 12 Frodo Release [April 2014]
-# v1.1    ADD config.txt for Webserver
-# v2.0    XBMC 13 Gotham
-# v2.1    Bugfix: jsonrpc API - KeyError, IndexError
-# v2.2    IF Player.GetItem title is empty check if label is set
-# v3.0    Kodi 14 Release - Refactor Version
-#         Published GitHub 03.10.2015
-# v3.2    Optimization movie title -> TITLEFORMAT -> oneline (default), twoline [smaller font size and optimized for two lines]
-#         
-# v3.3    Change the "time" and "totaltime" structure, screen draw optimization, new option -> TIMEFORMAT -> shows 6 minutes or 00:06:21 kodi
-#         -> ideas from Andrea Prunic <aprunic[at]gmail.com>
-# v3.4    Use the video structure for audio, update class KODI_WEBSERVER
-# v3.5    Delete v3.1
-#
-# From here modified by Daniel Siegmanski
-#
 # v4.0      Converted to python3
 # v4.1      Neue Anzeigemethode für Musik hinzugefügt "musicthumb"
+# v20190330  Zu neuer Versionsnummerrierung gewechselt, CHANGELOG nun in eigenständiger Datei
 
 import os
 import sys
 import datetime
 import pygame
 import configparser
-from pygame.locals import *
 from classes.Helper import Helper
 from classes.DrawToDisplay_Default import DrawToDisplay_Default
-from classes.DrawToDisplay_VideoTime import DrawToDisplay_VideoTime
 from classes.KODI_WEBSERVER import KODI_WEBSERVER
 from classes.DrawToDisplay_MusicThumbnail import DrawToDisplay_MusicThumbnail
 
