@@ -81,14 +81,19 @@ class DrawToDisplay_MusicThumbnail:
                     # Sollte bei der Veraebeitung des gefundenen Covers was schief gehen, nutzen wie das
                     # DefaultAlbumCover
                     self.thumbnail = Image.open(self._ConfigDefault['basedirpath'] + 'img/DefaultAlbumCover.png')
+                except TypeError:
+                    self.helper.printout("[warning]    ", self._ConfigDefault['mesg.yellow'])
+                    print('TypeError - DrawThumbnail')
+                    # Sollte bei der Veraebeitung des gefundenen Covers was schief gehen, nutzen wie das
+                    # DefaultAlbumCover
+                    self.thumbnail = Image.open(self._ConfigDefault['basedirpath'] + 'img/DefaultAlbumCover.png')
             else:
                 self.thumbnail = Image.open(self._ConfigDefault['basedirpath']+'img/DefaultAlbumCover.png')
 
             # Die Größe des Bildes anpassen
             self.thumbnail = self.thumbnail.resize(self._drawSetting['musicinfo.thumbnail.size'], Image.ANTIALIAS)
             # Das Bild an pygame senden
-            self.thumbnail = self.pygame.image.fromstring(self.thumbnail.tobytes(), self.thumbnail.size,
-                                                          self.thumbnail.mode)
+            self.thumbnail = self.pygame.image.fromstring(self.thumbnail.tobytes(), self.thumbnail.size, self.thumbnail.mode)
 
         # Das Cover mittig im Dispaly positionieren
         x = (self.screen.get_width()/2) - ((self._drawSetting['musicinfo.thumbnail.size'][0])/2)

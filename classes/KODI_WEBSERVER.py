@@ -97,11 +97,16 @@ class KODI_WEBSERVER:
             except KeyError as e:
                 self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
                 print("KeyError: " + str(e) + " in KODI_GetItem")
-                return "", "", ""
+                return "#error", "#error", "#error"
             except IndexError as e:
                 self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
                 print("IndexError: " + str(e) + " in KODI_GetItem")
-                return "", "", ""
+                return "#error", "#error", "#error"
+            except TypeError as e:
+                self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
+                print("TypeError: " + str(e) + " in KODI_GetItem")
+                return "#error", "#error", "#error"
+
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
             print('Decoding JSON has failed')
@@ -127,6 +132,11 @@ class KODI_WEBSERVER:
             except IndexError as e:
                 print("IndexError: " + str(e))
                 return 0, [0, 0, 0], [0, 0, 0]
+            except TypeError as e:
+                self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
+                print("IndexError: " + str(e) + " in KODI_GetProperties")
+                return 0, [0, 0, 0], [0, 0, 0]
+
 
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
@@ -137,13 +147,23 @@ class KODI_WEBSERVER:
         try:
             parsed_json = self.getJSON('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "playerid": ' + str(
                 playerid) + ', "properties": ["thumbnail"] }, "id": 1}')
+
+            url = parsed_json['result']['item']['thumbnail'][8:-1]
+
+            # URL ist nur valid wenn sie kein "http enthält und auf eine JPEG Datei verweist
+            if not 'http' in url and '.jpg' in url:
+                return url
+            else:
+                return ""
+
         except ValueError:
             self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
             print('Decoding JSON has failed')
             return ""
-
-        url = parsed_json['result']['item']['thumbnail'][8:-1]
-        return url
+        except TypeError as e:
+            self.helper.printout("[warning]    ", self._ConfigDefault['mesg.red'])
+            print("TypeError: " + str(e) + " in KODI_GetCoverURL")
+            return ""
 
     def KODI_DownloadCover(self, url):
         if url == "":

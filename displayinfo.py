@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# KodiDisplayInfo v20190330
+# KodiDisplayInfo v20190330-r1
 # Autor: Bjoern Reichert <opendisplaycase[at]gmx.net>
 # License: GNU General Public License (GNU GPLv3)
 #
@@ -191,14 +191,14 @@ def main():
                 speed, media_time, media_totaltime = KODI_WEBSERVER.KODI_GetProperties(playerid)
                 if _ConfigDefault['config.screenmodus_music'] == "time":
                     draw_videotime.drawProperties(media_title, time_now, speed, media_time, media_totaltime)
-                # Anzeigemodus "Thumnail" ist gewählt
+                # Anzeigemodus "Thumbnail" ist gewählt
                 if _ConfigDefault['config.screenmodus_music'] == "thumbnail":
                     # Neues Cover nur anfordern wenn sich das Album geändert hat
-                    if not media_album == old_album:
+                    if not media_album == old_album and media_album != "#error":
                         # Die URL für das Cover herausfinden
                         url = KODI_WEBSERVER.KODI_GetCoverURL(playerid)
                         # Das Cover nur herunterladen wenn es es auch gibt
-                        if not url == "" and not 'http' in url:
+                        if not url == "":
                             thumbnail = KODI_WEBSERVER.KODI_DownloadCover(url)
                             helper.printout("[info]    ", _ConfigDefault['mesg.green'])
                             print("Cover gefunden für: " + str(media_album))
@@ -206,7 +206,10 @@ def main():
                             helper.printout("[info]    ", _ConfigDefault['mesg.yellow'])
                             print("Kein Cover gefunden für: " + str(media_album))
                             thumbnail = "#empty"
-                        old_album = media_album
+
+                        if media_album != "#error":
+                            old_album = media_album
+
                     else:
                         if media_album == "":
                             thumbnail = "#empty"
