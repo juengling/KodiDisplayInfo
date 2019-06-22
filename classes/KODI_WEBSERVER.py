@@ -150,6 +150,8 @@ class KODI_WEBSERVER:
 
             url = parsed_json['result']['item']['thumbnail'][8:-1]
 
+            print(url)
+
             # URL ist nur valid wenn sie kein "http enthält und auf eine JPEG Datei verweist
             if not 'http' in url and '.jpg' in url:
                 return url

@@ -145,7 +145,7 @@ def main():
 
     helper.printout("[info]    ", _ConfigDefault['mesg.cyan'])
     print("Start: KodiDisplayInfo")
-    
+
     pygame.init()
     screen = pygame.display.set_mode(getattr(draw_default, 'Screen'+_ConfigDefault['display.resolution'])(), 0, 32)
     pygame.display.set_caption('KodiDisplayInfo')
