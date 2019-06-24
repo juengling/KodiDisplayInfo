@@ -1,61 +1,72 @@
 from datetime import timedelta
+from PIL import Image
+from io import BytesIO
+
 
 class DrawToDisplay_Default:
 
-    # default for 320x240
-    _drawSetting = {}
-    _drawSetting['startscreen.logo'] = ""
-    _drawSetting['startscreen.clock.fontsize'] = 60
-    _drawSetting['startscreen.clock.height_margin'] = 88
-    
     default_info_text = ""
     default_info_color = ""
     
     def __init__(self, helper, _ConfigDefault):
         self.helper = helper
         self._ConfigDefault = _ConfigDefault
-        
-        self.helper.printout("[info]    ", self._ConfigDefault['mesg.green'])
-        print(("Screen Setup  " + str(self._ConfigDefault['display.resolution'])))
-        
+
+    def setVars(self):
+        self._drawSetting = {}
+        self._drawSetting['startscreen.logo'] = self._ConfigDefault['basedirpath'] + 'img/kodi_logo.png'
+
+        self._drawSetting['startscreen.logo.size.prozent'] = 60
+        self._drawSetting['startscreen.logo.size.pixel'] = \
+            self.helper.PercentToPixel(self._drawSetting['startscreen.logo.size.prozent'])
+
+        # Anpassen der Größe des Logos
+        self.logo = Image.open(self._drawSetting['startscreen.logo'])
+        self.logo = self.logo.resize([self._drawSetting['startscreen.logo.size.pixel'],
+                                      self._drawSetting['startscreen.logo.size.pixel']], Image.ANTIALIAS)
+        self.logo = self.pygame.image.fromstring(self.logo.tobytes(), self.logo.size, self.logo.mode)
+
+
+        # Position der Uhrzeit
+        # Die Uhrzeit soll mittig zwischen unterem Logorand und unterem Bildrand angezeigt werden
+        # Berechnen des zu verfügung stehenden Platzes
+
+        free_space_time = ( self.screen.get_height() - self._drawSetting['startscreen.logo.size.pixel']) / 2
+        # Schriftgröße der Uhr ist 75% des zur verfügung stehenden Platzes
+        self._drawSetting['startscreen.clock.fontsize'] = round(free_space_time * 0.75)
+        # Position der Uhrzeit
+        self._drawSetting['startscreen.clock.y'] = round(self.screen.get_height() - free_space_time / 2)
+
+        # Position und Größe des Infotextes
+        # Der Infotext wird mittig zwischen oberen Rand und oberen Logorand angezeit
+        # Schriftgröße des Infotextes ist 60% der zur verfügung stehenden Höhe
+        self._drawSetting['startscreen.info.fontsize'] = round(free_space_time * 0.6)
+        # Position des Infotextes
+        self._drawSetting['startscreen.info.y'] = round(free_space_time / 2)
+
     def setPygameScreen(self, pygame, screen):
         self.pygame = pygame
         self.screen = screen
-        
-        getattr(self, 'SetupDrawSetting'+self._ConfigDefault['display.resolution'])()
-    
-    def Screen320x240(self):
-        return (320, 240)
-    
-    def Screen480x272(self):
-        return (480, 272)
-    
-    def Screen480x320(self):
-        return (480, 320)
-    
-    def SetupDrawSetting320x240(self):
-        self._drawSetting['startscreen.logo'] = self.pygame.image.load(self._ConfigDefault['basedirpath']+'img/kodi_logo_320x240.png')
-    
-    def SetupDrawSetting480x272(self):
-        self._drawSetting['startscreen.logo'] = self.pygame.image.load(self._ConfigDefault['basedirpath']+'img/kodi_logo_480x272.png')
-        self._drawSetting['startscreen.clock.fontsize'] = 64
-        self._drawSetting['startscreen.clock.height_margin'] = 102
-    
-    def SetupDrawSetting480x320(self):
-        self._drawSetting['startscreen.logo'] = self.pygame.image.load(self._ConfigDefault['basedirpath']+'img/kodi_logo_480x320.png')
-        self._drawSetting['startscreen.clock.fontsize'] = 75
-        self._drawSetting['startscreen.clock.height_margin'] = 118
-    
+
+        # DIe Konfiguration für die Anzeige initialisieren
+        self.setVars()
+
+
     def setInfoText(self, text, color):
         self.default_info_text = text
         self.default_info_color = color
     
     def infoTextKODI(self, text, color):
-        self.displaytext(text, 32, (self.screen.get_width()/2), 20, 'none', color)
+        self.displaytext(text, self._drawSetting['startscreen.info.fontsize'], (self.screen.get_width()/2),
+                         self._drawSetting['startscreen.info.y'], 'none', "false", color)
     
-    def displaytext(self, text, size, x, y, floating, color):
-        font = self.pygame.font.Font(self._ConfigDefault['basedirpath']+"fonts/MC360.ttf", size)
-        text = font.render(text, 1, color)
+    def displaytext(self, text, size, x, y, floating, bold, color):
+        # font = self.pygame.font.SysFont("monospace", size, bold=bold)
+        font = self.pygame.font.Font(self._ConfigDefault['basedirpath'] + "fonts/MC360.ttf", size)
+        if bold == "true":
+            font.set_bold(1)
+
+        text = font.render(text, 1, color, (200, 200, 200))
         if floating == 'right':
             x = x - text.get_rect().width
             y = y - text.get_rect().height
@@ -64,8 +75,8 @@ class DrawToDisplay_Default:
             y = y - text.get_rect().height
         else:
             x = x - (text.get_rect().width/2)
-            y = y - (text.get_rect().height/2) 
-            
+            y = y - (text.get_rect().height/2)
+
         self.screen.blit(text, [x, y])
     
     def drawLogoStartScreen(self, time_now):
@@ -74,8 +85,10 @@ class DrawToDisplay_Default:
         else:
             self.infoTextKODI("KodiDisplayInfo", self._ConfigDefault['color.white'])
         
-        x = (self.screen.get_width()/2) - (self._drawSetting['startscreen.logo'].get_rect().width/2)
-        y = (self.screen.get_height()/2) - (self._drawSetting['startscreen.logo'].get_rect().height/2)
-        self.screen.blit(self._drawSetting['startscreen.logo'],(x,y-10))
+        x = (self.screen.get_width()/2) - (self._drawSetting['startscreen.logo.size.pixel']/2)
+        y = (self.screen.get_height()/2) - (self._drawSetting['startscreen.logo.size.pixel']/2)
+        self.screen.blit(self.logo,(x,y-10))
 
-        self.displaytext(time_now.strftime("%H:%M:%S"), self._drawSetting['startscreen.clock.fontsize'], (self.screen.get_width()/2), (self.screen.get_height()/2)+self._drawSetting['startscreen.clock.height_margin'], 'none', (self._ConfigDefault['color.white']))
+        self.displaytext(time_now.strftime("%H:%M:%S"), self._drawSetting['startscreen.clock.fontsize'],
+                         self.screen.get_width()/2,
+                         self._drawSetting['startscreen.clock.y'],'none', "true", self._ConfigDefault['color.white'])

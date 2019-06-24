@@ -12,7 +12,7 @@ class DrawToDisplay_MusicThumbnail:
     _drawSetting['musicinfo.song.fontsize'] = 20
 
     # settings for the thumbnail
-    _drawSetting['musicinfo.thumbnail.size'] = 150, 150
+    _drawSetting['musicinfo.thumbnail.size_prozent'] = 60
 
     # in seconds
     time = 0
@@ -23,12 +23,18 @@ class DrawToDisplay_MusicThumbnail:
         self.helper = helper
         self._ConfigDefault = _ConfigDefault
 
+    def setPositions(self):
+        thumbnail_size = (int(self._ConfigDefault['display.resolution_height']) / 100)\
+                        * int(self._drawSetting['musicinfo.thumbnail.size_prozent'])
+
+        self._drawSetting['musicinfo.thumbnail.size'] = round(thumbnail_size), round(thumbnail_size)
+
     def setPygameScreen(self, pygame, screen, draw_default):
         self.pygame = pygame
         self.screen = screen
         self.draw_default = draw_default
 
-        getattr(self, 'SetupDrawSetting'+self._ConfigDefault['display.resolution'])()
+        # getattr(self, 'SetupDrawSetting'+self._ConfigDefault['display.resolution'])()
 
     def SetupDrawSetting320x240(self):
         self._drawSetting['startscreen.logo'] = self.pygame.image.load(self._ConfigDefault['basedirpath']+'img/kodi_logo_320x240.png')

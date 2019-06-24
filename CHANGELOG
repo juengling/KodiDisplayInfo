@@ -1,7 +1,7 @@
+v20190330-r1:
+- Weitere Fehlerbehebungen bei Value- und TypeErrors
+
 v20190330:
 - Versionsnummerrierung zu YYYYMMDD geändert
 - CHANGELOG in eigenständige Datei verschoben
 - Kleinere Fehlerbehebungen
-
-v20190330-r1:
-- Weitere Fehlerbehebungen bei Value- und TypeErrors

@@ -77,6 +77,19 @@ class Helper(object):
             exit()
 
     def print_info(self, text):
-        color = '\033[' + str(self._ConfigDefault['mesg.cyan']) + 'm' + '\033[1m'
+        color = '\033[' + str(self._ConfigDefault['mesg.info']) + 'm' + '\033[1m'
         print(color + "[info]    " + '\033[0m' + text)
 
+    def print_warning(self, text):
+        color = '\033[' + str(self._ConfigDefault['mesg.warning']) + 'm' + '\033[1m'
+        print(color + "[info]    " + '\033[0m' + text)
+
+    def print_error(self, text):
+        color = '\033[' + str(self._ConfigDefault['mesg.error']) + 'm' + '\033[1m'
+        print(color + "[info]    " + '\033[0m' + text)
+
+    # Berechnet die Anzahl an Pixeln, die ein Objekt hoch/breit sein darf um
+    # x Prozent des Displays auszufüllen
+    def PercentToPixel(self, percent):
+        pixel = round(int(self._ConfigDefault['display.resolution_height']) / 100 * percent)
+        return pixel
