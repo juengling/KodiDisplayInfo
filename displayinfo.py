@@ -102,7 +102,7 @@ if configParser.has_option('CONFIG', 'TIMEFORMAT'):
         
 if configParser.has_option('DISPLAY', 'RESOLUTION'):
     temp = configParser.get('DISPLAY', 'RESOLUTION')
-    if temp=="320x240" or temp=="480x272" or temp=="480x320":
+    if temp=="320x240" or temp=="480x272" or temp=="480x320" or temp=="240x240":
         _ConfigDefault['display.resolution'] = temp
     else:
         helper.printout("[warning]    ", _ConfigDefault['mesg.yellow'])
